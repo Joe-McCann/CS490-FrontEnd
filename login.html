@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <title>
+            Group 8 Login
+        </title>
+    </head>
+
+    <body>
+        <div id="title" class="center">
+            <h1 id="PageTitle">
+                Code 404: You're gonna fail
+            </h1>
+        </div>
+        <div id="formArea" class="center">
+            <div class="leftText">
+                <label>UCID:</label>
+                <input type="text" id="UCID" value="nic9">
+                <br>
+                <label>Password:</label>
+                <input type="password" id="Password" value="test">
+                <br>
+                <button onclick="requestLogin()" type="button">Submit</button>
+
+                <p id="responseArea">
+                    
+                </p>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        function requestLogin(){
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200){
+                    //document.getElementById("responseArea").innerHTML = this.responseText;
+                    resp = JSON.parse(this.responseText);
+
+                    if(resp["type"] == "invalid"){
+                        document.getElementById("responseArea").innerHTML += "Invalid Credentials";
+                    }
+
+                    else if(resp["type"] == "student"){
+                        redirect("studentHome.php", document.getElementById("UCID").value, "tttttt");
+                    }
+
+                    else if(resp["type"] == "instructor"){
+                        redirect("profHome.php", document.getElementById("UCID").value, "tttttt");
+                    }fds
+
+                    return;
+                }
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+            var ucid = document.getElementById("UCID").value;
+            var pass = document.getElementById("Password").value;
+            var jsonReq = JSON.stringify({reqType:"login", ucid:ucid , password:pass});
+            req.send(jsonReq);
+        }
+
+        function redirect(redirectURL, username, token){
+            var form = document.createElement("form");
+            var user = document.createElement("input");
+            var tokn = document.createElement("input");
+
+            form.method = "POST";
+            form.action = redirectURL;
+
+            user.value=username;
+            user.name="username";
+            form.appendChild(user);  
+
+            tokn.value=token;
+            tokn.name="token";
+            form.appendChild(tokn);
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+    </script>
+</html>
