@@ -3,38 +3,44 @@
         <title>
             Group 8 Login
         </title>
+        <link rel="stylesheet" type="text/css" href="zeta.css">
     </head>
 
     <body>
-        <div id="title" class="center">
-            <h1 id="PageTitle">
-                Code 404: You're gonna fail
-            </h1>
-        </div>
-        <div id="formArea" class="center">
-            <div class="leftText">
-                <label>UCID:</label>
-                <input type="text" id="UCID" value="nic9">
-                <br>
-                <label>Password:</label>
-                <input type="password" id="Password" value="test">
-                <br>
-                <button onclick="requestLogin()" type="button">Submit</button>
+        <div class="row">
+            <div class="column">
+                <div id="title" class="center">
+                    <h1 id="PageTitle">
+                        Code 404: You're gonna fail
+                    </h1>
+                </div>
+                <div id="formArea" class="center">
+                    <div class="leftText">
+                        <label>UCID:</label>
+                        <input type="text" id="UCID" value="nic9">
+                        <br>
+                        <label>Password:</label>
+                        <input type="password" id="Password" value="test">
+                        <br>
+                        <button onclick="requestLogin()" type="button">Submit</button>
 
-                <p id="responseArea">
-                    
-                </p>
+                        <p id="responseArea">
+                            
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
 
+    <script src="GELibrary.js"></script>
     <script>
         function requestLogin(){
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function(){
                 if (this.readyState == 4 && this.status == 200){
-                    //document.getElementById("responseArea").innerHTML = this.responseText;
+                    document.getElementById("responseArea").innerHTML = this.responseText;
                     resp = JSON.parse(this.responseText);
 
                     if(resp["type"] == "invalid"){
@@ -47,7 +53,7 @@
 
                     else if(resp["type"] == "instructor"){
                         redirect("profHome.php", document.getElementById("UCID").value, "tttttt");
-                    }fds
+                    }
 
                     return;
                 }
@@ -61,25 +67,5 @@
             req.send(jsonReq);
         }
 
-        function redirect(redirectURL, username, token){
-            var form = document.createElement("form");
-            var user = document.createElement("input");
-            var tokn = document.createElement("input");
-
-            form.method = "POST";
-            form.action = redirectURL;
-
-            user.value=username;
-            user.name="username";
-            form.appendChild(user);  
-
-            tokn.value=token;
-            tokn.name="token";
-            form.appendChild(tokn);
-
-            document.body.appendChild(form);
-
-            form.submit();
-        }
     </script>
 </html>

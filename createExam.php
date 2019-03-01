@@ -11,8 +11,6 @@
         }
         //make a curl token request for authentication
 
-        //make a curl get request 
-
         $ch = curl_init('getRequestOfActiveExams');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $exams = curl_exec($ch); 
@@ -64,6 +62,14 @@
                         <div class="list" id="Chosen">
 
                         </div>
+
+                        <form>
+                            <label for="difficulty">Exam Difficulty: </label>
+                            <input type="radio" name="diff" value="Easy" checked> Easy
+                            <input type="radio" name="diff" value="Medium" > Medium
+                            <input type="radio" name="diff" value="Hard" > Hard<br>
+                            Exam Name: <input type="text" id="ExamName"><br>
+                        </form>
                     </div>
 
                     <span>
@@ -91,15 +97,13 @@
                             Question Description ...
                         </textarea>
                     </div>
-                    <span>
+                    <form>
                         <label>
                             Filters: 
                         </label>
-                        <input type="text" id="filters" value="Separate Filters by Comma">
-                    </span>
-                    <div>
+                        <input type="text" id="filterList" value="Separate Filters by Comma">
                         <button onclick="submitQuestion()" type="button">Submit Question</button>
-                    </div>
+                    </form>
                 </div>
                 <p id="responseArea">
 
@@ -115,7 +119,7 @@
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function(){
-                //document.getElementById("responseArea").innerHTML = JSON.parse(this.responseText);
+                //document.getElementById("responseArea").innerHTML = this.responseText;
                 
             };
 
@@ -123,29 +127,49 @@
             req.setRequestHeader("Content-Type", "application/json");
 
             var qlist = document.getElementsByClassName("Chosen");
-            var jsonReq = {difficulty:"Easy", maxpoints:"0", status:"active", name: "holder", questions: []};
+            var requestBuild = {difficulty:"Easy", maxpoints:"0", status:"active", name: document.getElementById("ExamName").value, questions: []};
+            var maxPoints = 0;
+            var diff = "";
 
             for(var i = 0; i < qlist.length; ++i){
                 if (qlist[i].style.display === "none"){
                     continue;
                 }
-                
-                document.getElementById("responseArea").innerHTML += qlist[i].id;
+                var baseID = qlist[i].id;
+                var name = document.getElementById(baseID + "Name").textContent;
+                var points = document.getElementById(baseID + "Value").value;
+                maxPoints += parseInt(points);
+                question = {qid : i, qname : name, pointVal : points};
+                requestBuild.questions.push(question);
             }
 
-            var jsonReq = JSON.stringify({reqType:"submitExam", name:questionName, desc:desc, filters: filters});
+            var diffButtons = document.getElementsByName("diff");
+            for (var i = 0; i < diffButtons.length; ++i){
+                if (diffButtons[i].checked){
+                    diff = diffButtons[i].value;
+                    break;
+                }
+            }
+
+
+            requestBuild.maxpoints = maxPoints;
+            requestBuild.difficulty = diff;
+
+            var jsonReq = JSON.stringify({reqType:"submitExam", exam : requestBuild});
+            document.getElementById("responseArea").innerHTML = jsonReq;
             req.send(jsonReq);
         }
 
         function getQuestions(load){
-            var filter = "";
+            var filter = [];
             if (!load){
-                filter = document.getElementById("filters").value;
+                filter = document.getElementById("filters").value.split(",");
             }
 
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function(){
+                //document.getElementById("responseArea").innerHTML = this.responseText;
                 document.getElementById("Select").innerHTML = "";
                 document.getElementById("Chosen").innerHTML = "";
                 console.log(this.responseText);
@@ -185,9 +209,12 @@
                             wrapper.style.display = "none";
                         }
 
-                        label.appendChild(switchButton);   // add the box to the element
+                        label.id = question["name"] + box + "Name";
+
+
                         label.appendChild(activate);
                         wrapper.appendChild(descButton);
+                        wrapper.appendChild(switchButton);   // add the box to the element
                         wrapper.appendChild(label);
                         wrapper.appendChild(descWrapper);
 
@@ -198,7 +225,7 @@
 
                             points.type = "text";
                             points.value = "10";
-                            points.id = question["name"] + "Chosen" + "Value";
+                            points.id = question["name"] + box + "Value";
 
                             plabel.appendChild(pointText);
                             plabel.appendChild(points);
@@ -223,14 +250,14 @@
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function(){
-                //document.getElementById("responseArea").innerHTML = this.responseText;
+                document.getElementById("responseArea").innerHTML = this.responseText;
                 var resp = JSON.parse(this.responseText);
 
                 if(resp["SUCCESS"] == "true"){
-                    document.getElementById("responseArea").innerHTML = "Question added successfully!";
+                    document.getElementById("responseArea").innerHTML += "Question added successfully!";
                 }
                 else{
-                    document.getElementById("responseArea").innerHTML = "There was an error adding your question!";
+                    document.getElementById("responseArea").innerHTML += "There was an error adding your question!";
                 }
             };
 
@@ -239,7 +266,8 @@
 
             var questionName = document.getElementById("questionName").value;
             var desc = document.getElementById("description").value;
-            var filters = document.getElementById("filters").value.split(",");
+            var filters = document.getElementById("filterList").value.split(",");
+            console.log(document.getElementById("filterList").value);
             var jsonReq = JSON.stringify({reqType:"addQuestion", question:{name:questionName, desc:desc, filters: filters}});
             req.send(jsonReq);
         }
@@ -260,11 +288,11 @@
                     otherBox = "Select";
                 }
                 else{
-                    otherBox = "Chosen"
+                    otherBox = "Chosen";
                 }
 
-                var clicked = document.getElementById(qName + box + "Wrapper");
-                var other = document.getElementById(qName + otherBox + "Wrapper");
+                var clicked = document.getElementById(qName + box);
+                var other = document.getElementById(qName + otherBox);
                 clicked.style.display = "none";
                 other.style.display = "block";
             }

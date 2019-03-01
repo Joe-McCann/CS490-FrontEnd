@@ -25,67 +25,46 @@
         <title>
             Group 8 Professor HomePage
         </title>
+        <link rel="stylesheet" type="text/css" href="zeta.css">
     </head>
 
     <body>
-        <div id="title" class="center">
-            <h1 id="PageTitle">
-                Home Page
-            </h1>
-        </div>
-        <div>
-            <h4>
-                Active Exams
-                <?php
-                    print_r($credentials);
-                ?>
-            </h4>
-        </div>
-        <div id="formArea" class="center">
-            <div class="leftText">
-                <button type="button">View Grades</button>
-            </div>
-        </div>
-        <div class="center">
-            <div class="leftText">
-                <button onclick=<?php
-                echo "\"redirect('addQuestion.php', '".$credentials["username"]."', '".$credentials["token"]."')\" ";
-                ?>type="button">Add Question</button>
-            <br>
-            </div>
-        </div>
-        <div class="center">
-            <div class="leftText">
-                <button type="button">Create an Exam</button>
-                <p id="responseArea">
-                    
-                </p>
+        <div class="row">
+            <div class="column">
+                <div id="title" class="center">
+                    <h1 id="PageTitle">
+                        Home Page
+                    </h1>
+                </div>
+                <div>
+                    <h4>
+                        Active Exams
+                        <?php
+                            print_r($credentials);
+                        ?>
+                    </h4>
+                </div>
+                <div id="formArea" class="center">
+                    <div class="leftText">
+                        <button type="button">View Grades</button>
+                    </div>
+                </div>
+                <div class="center">
+                    <div class="leftText">
+                        <button onclick=<?php
+                        echo "\"redirect('createExam.php', '".$credentials["username"]."', '".$credentials["token"]."')\" ";
+                        ?> type="button">Create an Exam</button>
+                        <p id="responseArea">
+                            
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
 
+    <script src="GELibrary.js"></script>
     <script>
-
-        function redirect(redirectURL, username, token){
-            var form = document.createElement("form");
-            var user = document.createElement("input");
-            var tokn = document.createElement("input");
-
-            form.method = "POST";
-            form.action = redirectURL;
-
-            user.value=username;
-            user.name="username";
-            form.appendChild(user);  
-
-            tokn.value=token;
-            tokn.name="token";
-            form.appendChild(tokn);
-
-            document.body.appendChild(form);
-
-            form.submit();
-        }
 
     </script>
 

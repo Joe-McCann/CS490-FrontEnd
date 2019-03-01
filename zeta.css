@@ -1,0 +1,35 @@
+:root{
+    --colorScheme : 261;
+
+}
+.row {
+    display: flex;
+  }
+  
+.column {
+    background-color: hsl(var(--colorScheme), 30%, 68%);
+    padding: 2%;
+    flex: 50%;
+    border-style: solid;
+    border-width: 2px;
+    height: 800px;
+}
+
+.list {
+    background-color: hsl(var(--colorScheme), 30%, 85%);
+    overflow: auto;
+    height: 250px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.question {
+    border-style: dotted;
+    border-width: 1px;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+body{
+    background-color: hsl(var(--colorScheme), 30%, 25%);
+}

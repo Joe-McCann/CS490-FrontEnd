@@ -55,13 +55,22 @@
         </p>
         
     </body>
-
+    
+    <script src="GELibrary.js"></script>
     <script>
         function submitQuestion(){
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function(){
-                document.getElementById("responseArea").innerHTML = this.responseText;
+                //document.getElementById("responseArea").innerHTML = this.responseText;
+                var resp = JSON.parse(this.responseText);
+
+                if(resp["SUCCESS"] == "true"){
+                    document.getElementById("responseArea").innerHTML = "Question added successfully!";
+                }
+                else{
+                    document.getElementById("responseArea").innerHTML = "There was an error adding your question!";
+                }
             };
 
             req.open("POST", "link.php", true);
@@ -70,30 +79,10 @@
             var questionName = document.getElementById("questionName").value;
             var desc = document.getElementById("description").value;
             var filters = document.getElementById("filters").value.split(",");
-            var jsonReq = JSON.stringify({reqType:"addQuestion", name:questionName, desc:desc, filters: filters});
+            var jsonReq = JSON.stringify({reqType:"addQuestion", question:{name:questionName, desc:desc, filters: filters}});
             req.send(jsonReq);
         }
 
-        function redirect(redirectURL, username, token){
-            var form = document.createElement("form");
-            var user = document.createElement("input");
-            var tokn = document.createElement("input");
-
-            form.method = "POST";
-            form.action = redirectURL;
-
-            user.value=username;
-            user.name="username";
-            form.appendChild(user);  
-
-            tokn.value=token;
-            tokn.name="token";
-            form.appendChild(tokn);
-
-            document.body.appendChild(form);
-
-            form.submit();
-        }
     </script>
 
 </html>

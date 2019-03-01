@@ -4,7 +4,15 @@
     $data = json_decode($data, true);
 
     $middleUrls = array("login" => "https://web.njit.edu/~st565/checkAuth.php",
-                        "addQuestion" => "tbd");
+                        "addQuestion" => "https://web.njit.edu/~st565/addQuestion.php",
+                        "getQuestions" => "https://web.njit.edu/~st565/getQuestions.php",
+                        "submitExam" => "placeholder",
+                        "getExams" => "placeholder",
+                        "getExam" => "placeholder",
+                        "submitAttempt" => "placeholder",
+                        "getGrades" => "placeholder",
+                        "changeGrades" => "placeholder",
+                        "checkAuth" => "placeholder");
 
     $ch = curl_init($middleUrls[$data["reqType"]]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -13,8 +21,7 @@
     $response = curl_exec($ch); 
     curl_close($ch);
     echo $response;
-
-    if ($data["reqType"] != "login"){
+    if ($data["reqType"] == "addQuestion"){
         print_r($data);
     }
     
