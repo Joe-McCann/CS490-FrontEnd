@@ -97,11 +97,21 @@
                             Question Description ...
                         </textarea>
                     </div>
+                    <div id="testCases" class="list" style="width:50%;height:150px;">
+                        <label>Test Cases</label><br>
+                        <input type="text" id="testCase1" value="Code Compiles">
+                        <input type="text" id="answer1" value="N/A">
+                    </div>
+                    <button onclick="addTestCase()" type="button">Add Testcase</button>
                     <form>
                         <label>
                             Filters: 
                         </label>
                         <input type="text" id="filterList" value="Separate Filters by Comma">
+                        <br><label for="difficulty">Question Difficulty: </label>
+                        <input type="radio" name="qdiff" value="Easy" checked> Easy
+                        <input type="radio" name="qdiff" value="Medium" > Medium
+                        <input type="radio" name="qdiff" value="Hard" > Hard<br>
                         <button onclick="submitQuestion()" type="button">Submit Question</button>
                     </form>
                 </div>
@@ -114,6 +124,22 @@
 
     <script src="GELibrary.js"></script>
     <script>
+        var testCases = 1;
+        function addTestCase(){
+            testCases++;
+            var test = document.createElement("input");
+            var answer = document.createElement("input");
+
+            test.type = "text";
+            test.id = "testCase" + testCases;
+            answer.type = "text";
+            answer.id = "answer" + testCases;
+
+            var wrapper = document.getElementById("testCases");
+            wrapper.appendChild(document.createElement("br"));
+            wrapper.appendChild(test);
+            wrapper.appendChild(answer);
+        }
 
         function submitExam(){
             var req = new XMLHttpRequest();
@@ -139,7 +165,7 @@
                 var name = document.getElementById(baseID + "Name").textContent;
                 var points = document.getElementById(baseID + "Value").value;
                 maxPoints += parseInt(points);
-                question = {qid : i, qname : name, pointVal : points};
+                question = {name : name, points : points};
                 requestBuild.questions.push(question);
             }
 
@@ -172,7 +198,6 @@
                 //document.getElementById("responseArea").innerHTML = this.responseText;
                 document.getElementById("Select").innerHTML = "";
                 document.getElementById("Chosen").innerHTML = "";
-                console.log(this.responseText);
                 var resp = JSON.parse(this.responseText);
                 var question;
                 var boxes = ["Select", "Chosen"];
@@ -267,8 +292,23 @@
             var questionName = document.getElementById("questionName").value;
             var desc = document.getElementById("description").value;
             var filters = document.getElementById("filterList").value.split(",");
-            console.log(document.getElementById("filterList").value);
-            var jsonReq = JSON.stringify({reqType:"addQuestion", question:{name:questionName, desc:desc, filters: filters}});
+
+            var diff;
+            var diffButtons = document.getElementsByName("qdiff");
+            for (var i = 0; i < diffButtons.length; ++i){
+                if (diffButtons[i].checked){
+                    diff = diffButtons[i].value;
+                    break;
+                }
+            }
+
+            var TC = [];
+            for (var i = 1; i <= testCases; ++i){
+                var j = i.toString();
+
+                TC.push({case: document.getElementById("testCase" + j).value, ans: document.getElementById("answer" + j).value});
+            }
+            var jsonReq = JSON.stringify({reqType:"addQuestion", answers: TC, question:{name:questionName, desc:desc, filters: filters, difficulty: diff}});
             req.send(jsonReq);
         }
 

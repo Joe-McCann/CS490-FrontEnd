@@ -1,0 +1,167 @@
+<html>
+
+    <?php
+
+        $inp = file_get_contents('php://input');
+        $inp = explode("&", $inp);
+        $credentials = array();
+        foreach ($inp as $cred){
+            $vals = explode("=", $cred);
+            $credentials[$vals[0]] = $vals[1];
+        }
+        //make a curl token request for authentication
+
+        $ch = curl_init('getRequestOfActiveExams');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $exams = curl_exec($ch); 
+        curl_close($ch);
+
+
+    ?>
+
+    <head>
+        <title>
+            Group 8 Student HomePage
+        </title>
+        <link rel="stylesheet" type="text/css" href="zeta.css">
+    </head>
+
+    <body onload="getExam()">
+        <div class="row">
+            <button onclick=<?php
+                echo "\"redirect('studentHome.php', '".$credentials["username"]."', '".$credentials["token"]."')\" ";
+            ?>type="button">Home</button>
+                
+        </div>
+        <div class="row">
+            <div class="column">
+                <div id="title" class="center">
+                    <h4 id="examName">
+                        Exam
+                    </h4>
+                </div>
+                <div id="exam"></div>
+                <div id="qnav"></div>
+                <div>
+                    <button onclick="submitAttempt()" type="button">Submit</button>
+                </div>
+                <p id="responseArea">
+                                
+                </p>
+            </div>
+                
+        </div>
+    </body>
+
+    <script src="GELibrary.js"></script>
+    <script>
+
+        function getExam(){
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                //document.getElementById("responseArea").innerHTML = this.responseText;
+                document.getElementById("exam").innerHTML = "";
+                document.getElementById("qnav").innerHTML = "<label>Questions: </label>";
+                var resp = JSON.parse(this.responseText);
+                //console.log(resp);
+                var questions = resp["exam"]
+
+                for(var question of questions){
+                    var wrapper = document.createElement("div");
+                    var title = document.createElement("h4");
+                    var desc = document.createElement("p");
+                    var button = document.createElement("button");
+                    var answerArea = document.createElement("textarea");
+                    var answerLabel = document.createElement("label");
+                    var pointsLabel = document.createElement("label");
+                    
+
+                    title.id = question["name"] + "Title";
+                    title.appendChild(document.createTextNode("Question " + question["number"] + ":\t" + question["name"]));
+
+                    desc.appendChild(document.createTextNode(question["description"]));
+
+                    answerLabel.appendChild(document.createTextNode("Write code here:"));
+
+                    pointsLabel.appendChild(document.createTextNode("This question is worth " + question["points"] + " points."));
+                    pointsLabel.value = question["points"];
+                    pointsLabel.id = question["name"] + "Points";
+
+                    answerArea.cols = 80;
+                    answerArea.rows = 50;
+                    answerArea.className = "textInput";
+                    answerArea.id = question["name"] + "Input";
+
+                    wrapper.appendChild(title);
+                    wrapper.appendChild(pointsLabel);
+                    wrapper.appendChild(desc);
+                    wrapper.appendChild(answerLabel);
+                    wrapper.appendChild(document.createElement("br"));
+                    wrapper.appendChild(answerArea);
+                    wrapper.className = "questionWrapper";
+                    wrapper.id = question["name"] + "Wrapper";
+                    wrapper.value = question["name"]
+                    
+                    if (question["number"] === "1"){
+                        wrapper.style.display = "block";
+                    }
+                    else{
+                        wrapper.style.display = "none";
+                    }
+
+                    button.id = question["name"] + "Button";
+                    button.onclick = switchQuestion(question["name"])
+                    button.appendChild(document.createTextNode(question["number"]));
+
+                    document.getElementById("exam").appendChild(wrapper);
+                    document.getElementById("qnav").appendChild(button);
+                }
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+
+            var jsonReq = JSON.stringify({reqType:"getExam", eid: <?php echo "\"".$credentials['eid']."\"" ?>});
+            req.send(jsonReq);
+        }
+
+        function submitAttempt(){
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                document.getElementById("responseArea").innerHTML = this.responseText;
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+
+            var questions = document.getElementsByClassName("questionWrapper");
+            var answers = [];
+            for(var question of questions){
+                answers.push({qname:question.value, answer:document.getElementById(question.value + "Input").value, points:document.getElementById(question.value + "Points").value});
+            }
+
+
+            var jsonReq = JSON.stringify({reqType:"submitAttempt", eid: <?php echo "\"".$credentials['eid']."\"" ?>, answers: answers});
+            console.log(jsonReq);
+            req.send(jsonReq);
+        }
+
+        function switchQuestion(name){
+            return function() {
+                var questions = document.getElementsByClassName("questionWrapper");
+                for (var question of questions){
+                    if (question.id === name + "Wrapper"){
+                        question.style.display = "block";
+                    }
+                    else{
+                        question.style.display = "none";
+                    }
+                }
+            }
+        }
+
+    </script>
+
+</html>

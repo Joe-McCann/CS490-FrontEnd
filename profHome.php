@@ -28,21 +28,29 @@
         <link rel="stylesheet" type="text/css" href="zeta.css">
     </head>
 
-    <body>
+    <body onload="getExams('active')">
         <div class="row">
             <div class="column">
                 <div id="title" class="center">
                     <h1 id="PageTitle">
                         Home Page
                     </h1>
+                    <p id="responseArea">
+                            
+                    </p>
                 </div>
                 <div>
                     <h4>
-                        Active Exams
+                        Exams
                         <?php
                             print_r($credentials);
                         ?>
                     </h4>
+                    <div id="wrap">
+                        <table id="exams">
+                            
+                        </table>
+                    </div>
                 </div>
                 <div id="formArea" class="center">
                     <div class="leftText">
@@ -54,18 +62,81 @@
                         <button onclick=<?php
                         echo "\"redirect('createExam.php', '".$credentials["username"]."', '".$credentials["token"]."')\" ";
                         ?> type="button">Create an Exam</button>
-                        <p id="responseArea">
-                            
-                        </p>
                     </div>
                 </div>
             </div>
         </div>
+        
     </body>
 
     <script src="GELibrary.js"></script>
     <script>
 
+        function getExams(stat){
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                //console.log(this.responseText);
+                document.getElementById("exams").innerHTML="<thead><tr><th>Exam ID</th><th>Exam Name</th><th>Difficulty</th><th>Max Score</th></tr></thead>";
+                var exams = JSON.parse(this.responseText);
+                var strs = ["id", "name", "difficulty", "maxpoints"];
+                for(var exam of exams["examList"]){
+                    //console.log(exam);
+                    if(exam["name"] === ""){
+                        continue; // Just because there is some filler data I want to avoid
+                    }
+                    
+                    var row = document.createElement("tr");
+
+                    for(var key of strs){
+                        var Label = document.createElement("label");
+                        var Text = document.createTextNode(exam[key]);
+                        var el = document.createElement("td");
+
+                        Label.appendChild(Text);
+                        el.appendChild(Label);
+                        row.appendChild(el);
+                    }
+                    var but = document.createElement("td")
+                    var takeTest = document.createElement("button");
+                    var buttonText = document.createTextNode("Take Exam");
+                    
+                    takeTest.value = "Take Exam";
+                    takeTest.id = "button" + exam["name"];
+                    takeTest.appendChild(buttonText);
+                    //takeTest.onclick = getRedirect(exam["id"]);
+                    but.appendChild(takeTest);
+                    row.appendChild(but);
+                    
+                    document.getElementById("exams").appendChild(row);
+                    //document.getElementById("exams").appendChild(document.createElement("br"));
+                }
+                    
+                
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+
+            var jsonReq = JSON.stringify({reqType:"getExams", status: stat});
+            req.send(jsonReq);
+        }
+
+        function getExam(){
+
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                document.getElementById("responseArea").innerHTML = this.responseText;
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+
+            var jsonReq = JSON.stringify({reqType:"getExam", eid:"15"});
+            req.send(jsonReq);
+            //document.getElementById("responseArea").innerHTML = "AH";
+        }
     </script>
 
 </html>

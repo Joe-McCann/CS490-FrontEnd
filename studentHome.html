@@ -27,9 +27,9 @@
         <link rel="stylesheet" type="text/css" href="zeta.css">
     </head>
 
-    <body>
+    <body onload="getExams('all')">
     <div class="row">
-    <div class="column">
+        <div class="column">
                 <div id="title" class="center">
                     <h1 id="PageTitle">
                         Home Page
@@ -37,13 +37,11 @@
                 </div>
                 <div>
                     <h4>
-                        Active Exams
+                        Exams
                     </h4>
-                    <?php
-                        foreach($exams["active"] as $exam){
-                            echo '<p>' . $exam . '</p>';
-                        }
-                    ?>
+                    <div id="exams" class="list">
+
+                    </div>
                 </div>
                 <div id="formArea" class="center">
                     <div class="leftText">
@@ -53,8 +51,31 @@
                         </p>
                     </div>
                 </div>
-                </div>
-                </div>
+            </div>
+        </div>
     </body>
+
+    <script src="GELibrary.js"></script>
+    <script>
+
+        function getExams(stat){
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function(){
+                //console.log(this.responseText);
+                document.getElementById("responseArea").innerHTML = JSON.parse(this.responseText);
+                
+                    
+                
+            };
+
+            req.open("POST", "link.php", true);
+            req.setRequestHeader("Content-Type", "application/json");
+
+            var jsonReq = JSON.stringify({reqType:"getExams", status: stat});
+            req.send(jsonReq);
+        }
+
+    </script>
 
 </html>

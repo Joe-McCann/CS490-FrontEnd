@@ -1,6 +1,5 @@
 :root{
     --colorScheme : 261;
-
 }
 .row {
     display: flex;
@@ -30,6 +29,37 @@
     padding-bottom: 2%;
 }
 
+.textInput {
+    overflow-y: scroll;
+    white-space: pre-wrap;
+    height: 200px;
+    resize: none; /* Remove this if you want the user to resize the textarea */
+}
+
 body{
     background-color: hsl(var(--colorScheme), 30%, 25%);
 }
+
+#wrap {
+    overflow: auto;
+    height: 100px;
+}
+
+th{
+    background-color: gray;
+    color: rgb(29, 28, 28);
+    text-align: center;
+}
+
+td {
+    background-color: rgb(172, 172, 172);
+    color: rgb(41, 39, 39);
+}
+
+table {
+    border-collapse: collapse;
+  }
+
+table, th, td {
+    border: 1px solid black;
+  }
